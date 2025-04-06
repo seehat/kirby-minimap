@@ -2,7 +2,7 @@
   "name": "johannschopplich/kirby-minimap",
   "description": "Sidebar content navigation plugin for the Kirby Panel",
   "type": "kirby-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "content",
     "kirby",

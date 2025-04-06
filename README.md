@@ -12,6 +12,12 @@ This is especially useful when working with complex page designs that contain ma
 - 📯 **Block Preview**: For block fields, the minimap shows each block with its type icon and content preview
 - 🔆 **Automatic Highlighting**: The minimap automatically highlights your current position as you scroll through the Panel view
 
+## Demo
+
+For a quick demo of the minimap in action, check out the following screencast:
+
+https://github.com/user-attachments/assets/40e4e439-a79a-49b4-9c55-d6ab8fba8373
+
 ## Requirements
 
 - Kirby 4 or Kirby 5
@@ -34,8 +40,10 @@ Download and copy this repository to `/site/plugins/kirby-minimap`.
 
 Once installed, the minimap will automatically appear on the right side of your Panel when editing content. The minimap has two states:
 
-1. **Collapsed** - Shows only a thin vertical line with markers for each field
-2. **Expanded** - Shows the full minimap with field names and block details
+1. **Collapsed**
+   Shows only a thin vertical line with markers for each field.
+3. **Expanded**
+   Shows the full minimap with field names and block details.
 
 You can toggle between these states by clicking the arrow button at the top of the minimap.
 

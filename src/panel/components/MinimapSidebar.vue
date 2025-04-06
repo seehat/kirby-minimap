@@ -22,8 +22,6 @@ const isOpen = ref(
 const fields = ref({});
 const activeFieldNames = ref([]);
 const activeBlockIds = ref([]);
-
-let observer;
 // Track previously observed block IDs to manage cleanup
 const observedBlockIds = new Set();
 
@@ -78,6 +76,11 @@ useEventListener(minimap, "click", (event) => {
   }
 });
 
+const observer = useIntersectionObserver({
+  rootMargin: "0px",
+  threshold: 0,
+});
+
 (async () => {
   // Set the initial width of the minimap based on the open state
   updateMinimapWidth(isOpen.value);
@@ -108,12 +111,6 @@ useEventListener(minimap, "click", (event) => {
     // eslint-disable-next-line no-console
     console.log("Model fields:", fields.value);
   }
-
-  // Setup intersection observer after fields are loaded
-  observer = useIntersectionObserver({
-    rootMargin: "0px",
-    threshold: 0.15,
-  });
 
   // Observe field elements
   for (const fieldName of Object.keys(fields.value)) {

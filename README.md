@@ -2,7 +2,7 @@
 
 # Kirby Minimap
 
-A sidebar navigation for the Kirby Panel that provides a structured view of all the fields and blocks in the current view.
+A sidebar navigation for the Kirby Panel that provides a structured overview of all fields and blocks in the current Panel view.
 
 This is especially useful when working with complex page designs that contain many fields or long block fields. The minimap displays a compact navigation sidebar that highlights the current position in the content editor and allows you to quickly jump to any field or block.
 

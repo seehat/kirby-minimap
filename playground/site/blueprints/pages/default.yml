@@ -1,0 +1,73 @@
+title: Page
+
+columns:
+  - width: 1/1
+    sections:
+      meta:
+        type: fields
+        fields:
+          cover:
+            type: files
+            template: blocks/image
+          date:
+            type: date
+            time: true
+            default: now
+            required: true
+          author:
+            type: users
+            required: true
+          tags: true
+      files:
+        type: files
+        template: blocks/image
+
+  - width: 1/1
+    sections:
+      content:
+        type: fields
+        fields:
+          blocks:
+            type: blocks
+
+  - width: 1/2
+    sections:
+      dummy1:
+        type: fields
+        fields:
+          text:
+            type: text
+            label: Dummy field 1
+            required: true
+          textarea:
+            type: textarea
+            label: Dummy field 2
+          toggle:
+            type: toggle
+            label: Dummy field 3
+
+  - width: 1/2
+    sections:
+      dummy2:
+        type: fields
+        fields:
+          number:
+            type: number
+            label: Dummy field 4
+          select:
+            type: select
+            label: Dummy field 5
+            options:
+              option1: Option 1
+              option2: Option 2
+              option3: Option 3
+          structure:
+            type: structure
+            label: Dummy field 6
+            fields:
+              title:
+                type: text
+                label: Title
+              text:
+                type: textarea
+                label: Text

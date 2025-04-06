@@ -1,0 +1,18 @@
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --minimap-width-closed: calc(1rem + 2 * var(--menu-padding));
+  --minimap-width-open: var(--menu-width-open);
+  --minimap-width: var(--minimap-width-closed);
+}
+
+.k-panel-main {
+  margin-inline-end: var(--main-end);
+}
+
+@media (min-width: 60rem) {
+  .k-panel {
+    --main-end: var(--minimap-width);
+  }
+}

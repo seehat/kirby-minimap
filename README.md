@@ -42,13 +42,13 @@ Once installed, the minimap will automatically appear on the right side of your 
 
 1. **Collapsed**
    Shows only a thin vertical line with markers for each field.
-3. **Expanded**
+2. **Expanded**
    Shows the full minimap with field names and block details.
 
 You can toggle between these states by clicking the arrow button at the top of the minimap.
 
 > [!NOTE]
-> Fields with `type: hidden` will not be shown in the minimap.
+> Contentless field types (e.g. `gap`, `hidden`, `line`) are not displayed in the minimap.
 
 ## License
 

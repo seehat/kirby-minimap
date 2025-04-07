@@ -7,6 +7,7 @@ import {
 } from "../composables/listeners";
 import { useModelId } from "../composables/model";
 
+const EXCLUDED_FIELD_TYPES = ["gap", "hidden", "line"];
 const OPEN_STATE_STORAGE_KEY = "kirby$minimap";
 
 const panel = usePanel();
@@ -117,6 +118,13 @@ async function initializeMinimapContent() {
     // Silent
     true,
   );
+
+  for (const [key, field] of Object.entries(modelFields)) {
+    if (EXCLUDED_FIELD_TYPES.includes(field.type)) {
+      delete modelFields[key];
+    }
+  }
+
   fields.value = modelFields;
 
   // Set up observers for each field

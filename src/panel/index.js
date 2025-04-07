@@ -4,15 +4,25 @@ import "./index.css";
 window.panel.plugin("johannschopplich/minimap", {
   use: [
     function minimapInjectionMixin(Vue) {
+      let minimapComponent;
+
       Vue.mixin({
         mounted() {
           if (this.$options.name !== "k-panel-inside") return;
 
           const MinimapSidebarConstructor = Vue.extend(MinimapSidebar);
-          const minimap = new MinimapSidebarConstructor({ parent: this });
-          minimap.$mount();
+          minimapComponent = new MinimapSidebarConstructor({ parent: this });
+          minimapComponent.$mount();
 
-          this.$el.appendChild(minimap.$el);
+          this.$el.appendChild(minimapComponent.$el);
+        },
+        beforeDestroy() {
+          if (this.$options.name !== "k-panel-inside") return;
+
+          if (minimapComponent) {
+            minimapComponent.$destroy();
+            minimapComponent = undefined;
+          }
         },
       });
     },

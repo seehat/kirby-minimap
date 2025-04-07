@@ -8,6 +8,7 @@ import {
 import { useModelId } from "../composables/model";
 
 const OPEN_STATE_STORAGE_KEY = "kirby$minimap";
+
 const panel = usePanel();
 const { currentContent, contentChanges } = useContent();
 const { getModelId } = useModelId();
@@ -22,47 +23,30 @@ const isOpen = ref(
 const fields = ref({});
 const activeFieldNames = ref([]);
 const activeBlockIds = ref([]);
-// Track previously observed block IDs to manage cleanup
 const observedBlockIds = new Set();
 
 const resolvedFields = computed(() =>
   Object.fromEntries(
-    Object.entries(fields.value)
-      .filter(([_, field]) => field.type !== "hidden")
-      .map(([key, field]) => {
-        const content = contentChanges.value[key] ?? currentContent.value[key];
-        const blocks =
-          field.type === "blocks" && Array.isArray(content)
-            ? content.map((block) => ({
-                ...block,
-                isActive: activeBlockIds.value.includes(block.id),
-              }))
-            : [];
+    Object.entries(fields.value).map(([key, field]) => {
+      const content = contentChanges.value[key] ?? currentContent.value[key];
+      const blocks =
+        field.type === "blocks" && Array.isArray(content)
+          ? content.map((block) => ({
+              ...block,
+              isActive: activeBlockIds.value.includes(block.id),
+            }))
+          : [];
 
-        return [
-          key,
-          {
-            ...field,
-            blocks,
-            isActive: activeFieldNames.value.includes(field.name),
-          },
-        ];
-      }),
+      return [
+        key,
+        {
+          ...field,
+          blocks,
+          isActive: activeFieldNames.value.includes(field.name),
+        },
+      ];
+    }),
   ),
-);
-
-watch(isOpen, (newValue) => {
-  localStorage.setItem(OPEN_STATE_STORAGE_KEY, newValue);
-  updateMinimapWidth(newValue);
-});
-
-// Watch for changes in content to update observers for blocks
-watch(
-  [currentContent, contentChanges],
-  () => {
-    updateBlockObservers();
-  },
-  { deep: true },
 );
 
 useEventListener(minimap, "click", (event) => {
@@ -80,8 +64,37 @@ const observer = useIntersectionObserver({
   threshold: 0,
 });
 
-(async () => {
-  // Set the initial width of the minimap based on the open state
+watch(isOpen, (newValue) => {
+  localStorage.setItem(OPEN_STATE_STORAGE_KEY, newValue);
+  updateMinimapWidth(newValue);
+});
+
+// Watch for content changes to update observers for blocks
+watch(
+  [currentContent, contentChanges],
+  () => {
+    updateBlockObservers();
+  },
+  { deep: true },
+);
+
+// Watch for navigation changes in the Panel
+watch(
+  () => panel.view.path,
+  async () => {
+    // Clear existing observers before fetching new fields
+    cleanupObservers();
+
+    // Refetch fields for new view
+    await initializeMinimapContent();
+  },
+  { immediate: true },
+);
+
+initializeMinimapUI();
+
+// Handle initialization of UI elements that only need to be set once
+function initializeMinimapUI() {
   updateMinimapWidth(isOpen.value);
 
   // Get height from top of the page to the bottom of the header
@@ -91,27 +104,22 @@ const observer = useIntersectionObserver({
       Number.parseFloat(getComputedStyle(header).paddingTop)
     : 0;
   setCssProperty("--minimap-top-offset", `${bottomEdge}px`);
+}
 
-  // Fetch model ID for the current Panel view
+// Fetch fields and set up observers for the current view
+async function initializeMinimapContent() {
   const modelId = await getModelId();
 
-  // Fetch all resolved fields for the current model
-  fields.value = await panel.api.get(
+  const modelFields = await panel.api.get(
     "__minimap__/model-fields",
     { id: modelId ?? "site" },
     undefined,
     // Silent
     true,
   );
+  fields.value = modelFields;
 
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log("Current content:", currentContent.value);
-    // eslint-disable-next-line no-console
-    console.log("Model fields:", fields.value);
-  }
-
-  // Observe field elements
+  // Set up observers for each field
   for (const fieldName of Object.keys(fields.value)) {
     const fieldElement = document.querySelector(`.k-field-name-${fieldName}`);
     if (!fieldElement) continue;
@@ -129,12 +137,23 @@ const observer = useIntersectionObserver({
 
   // Initial setup of block observers
   updateBlockObservers();
-})();
+}
 
+// Clean up observers and reset tracking state to prevent memory leaks
+function cleanupObservers() {
+  if (!observer) return;
+
+  observer.disconnect();
+
+  activeFieldNames.value = [];
+  activeBlockIds.value = [];
+  observedBlockIds.clear();
+}
+
+// Observe new blocks and unobserve deleted blocks
 function updateBlockObservers() {
   if (!observer) return;
 
-  // Track new block IDs that need to be observed
   const currentBlockIds = new Set();
 
   // Add observers for all blocks in all block fields
@@ -147,8 +166,6 @@ function updateBlockObservers() {
 
     for (const block of content) {
       currentBlockIds.add(block.id);
-
-      // Skip if already observing this block
       if (observedBlockIds.has(block.id)) continue;
 
       const blockElement = document.querySelector(`[data-id="${block.id}"]`);
@@ -164,7 +181,6 @@ function updateBlockObservers() {
         }
       });
 
-      // Add to tracked blocks
       observedBlockIds.add(block.id);
     }
   }

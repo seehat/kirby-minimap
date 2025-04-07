@@ -60,7 +60,6 @@ watch(isOpen, (newValue) => {
 watch(
   [currentContent, contentChanges],
   () => {
-    if (Object.keys(fields.value).length === 0) return;
     updateBlockObservers();
   },
   { deep: true },
@@ -175,19 +174,13 @@ function updateBlockObservers() {
     (id) => !currentBlockIds.has(id),
   );
 
-  for (const id of deletedBlockIds) {
-    // Remove from active blocks if it was active
+  if (deletedBlockIds.length) {
     activeBlockIds.value = activeBlockIds.value.filter(
-      (activeId) => activeId !== id,
+      (activeId) => !deletedBlockIds.includes(activeId),
     );
 
-    // Remove from observed blocks
-    observedBlockIds.delete(id);
-
-    // Try to unobserve the element (even though it might be gone from DOM)
-    const element = document.querySelector(`[data-id="${id}"]`);
-    if (element) {
-      observer.unobserve(element);
+    for (const id of deletedBlockIds) {
+      observedBlockIds.delete(id);
     }
   }
 }

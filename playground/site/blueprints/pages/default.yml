@@ -1,26 +1,24 @@
 title: Page
 
 columns:
-  - width: 1/1
-    sections:
-      meta:
-        type: fields
-        fields:
-          cover:
-            type: files
-            template: blocks/image
-          date:
-            type: date
-            time: true
-            default: now
-            required: true
-          author:
-            type: users
-            required: true
-          tags: true
-      files:
-        type: files
-        template: blocks/image
+  # - width: 1/1
+  #   sections:
+  #     meta:
+  #       type: fields
+  #       fields:
+  #         cover:
+  #           type: files
+  #           template: blocks/image
+  #         date:
+  #           type: date
+  #           time: true
+  #           default: now
+  #         author:
+  #           type: users
+  #         tags: true
+  #     files:
+  #       type: files
+  #       template: blocks/image
 
   - width: 1/1
     sections:

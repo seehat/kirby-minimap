@@ -32,7 +32,9 @@ const resolvedFields = computed(() =>
         field.type === "blocks" && Array.isArray(content)
           ? content.map((block) => ({
               ...block,
-              isActive: activeBlockIds.value.includes(block.id),
+              _icon: getBlockIcon(block.type),
+              _text: extractBlockText(block),
+              _active: activeBlockIds.value.includes(block.id),
             }))
           : [];
 
@@ -41,7 +43,7 @@ const resolvedFields = computed(() =>
         {
           ...field,
           blocks,
-          isActive: activeFieldNames.value.includes(field.name),
+          _active: activeFieldNames.value.includes(field.name),
         },
       ];
     }),
@@ -79,7 +81,7 @@ watch(
 
 // Watch for navigation changes in the Panel
 watch(
-  () => panel.view.path,
+  [() => panel.view.path, () => panel.view.props.tab],
   async () => {
     // Clear existing observers before fetching new fields
     cleanupObservers();
@@ -129,13 +131,27 @@ async function initializeMinimapContent() {
     true,
   );
 
-  for (const [key, field] of Object.entries(modelFields)) {
+  let filteredFields = modelFields;
+
+  // Filter fields based on current tab
+  if (panel.view.props.tabs && panel.view.props.tabs.length > 1) {
+    const currentTabFieldNames = extractCurrentTabFieldNames();
+
+    filteredFields = Object.fromEntries(
+      Object.entries(modelFields).filter(([key]) =>
+        currentTabFieldNames.has(key),
+      ),
+    );
+  }
+
+  // Remove excluded field types from the model fields
+  for (const [key, field] of Object.entries(filteredFields)) {
     if (EXCLUDED_FIELD_TYPES.includes(field.type)) {
-      delete modelFields[key];
+      delete filteredFields[key];
     }
   }
 
-  fields.value = modelFields;
+  fields.value = filteredFields;
 
   // Set up observers for each field
   for (const fieldName of Object.keys(fields.value)) {
@@ -234,6 +250,22 @@ function setCssProperty(property, value) {
   document.documentElement.style.setProperty(property, value);
 }
 
+function extractCurrentTabFieldNames() {
+  const fieldNames = new Set();
+
+  for (const column of panel.view.props.tab.columns) {
+    for (const section of Object.values(column.sections)) {
+      if (section.type !== "fields") continue;
+
+      for (const field of Object.values(section.fields)) {
+        fieldNames.add(field.name);
+      }
+    }
+  }
+
+  return fieldNames;
+}
+
 function scrollToField(fieldName) {
   const fieldElement = document.querySelector(`.k-field-name-${fieldName}`);
   if (!fieldElement) return;
@@ -264,7 +296,7 @@ function scrollToField(fieldName) {
                   ? 'km-py-[var(--spacing-2)]'
                   : 'km-py-[var(--spacing-3)]',
               ]"
-              :data-active="String(field.isActive)"
+              :data-active="String(field._active)"
               @click="scrollToField(field.name)"
             >
               <template v-if="isOpen">
@@ -286,12 +318,12 @@ function scrollToField(fieldName) {
                 v-for="(block, blockIndex) in field.blocks"
                 :key="`${blockIndex}-${block.id}`"
                 class="k-panel-minimap-menu-item km-flex km-py-[var(--spacing-1)] km-items-center km-gap-[var(--spacing-2)]"
-                :data-active="String(block.isActive)"
+                :data-active="String(block._active)"
                 @click="scrollToBlock(block.id)"
               >
-                <k-icon :type="getBlockIcon(block.type)" />
+                <k-icon :type="block._icon" />
                 <span class="k-label-text">
-                  {{ extractBlockText(block) }}
+                  {{ block._text }}
                 </span>
               </div>
             </template>

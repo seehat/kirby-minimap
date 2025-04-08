@@ -38,8 +38,6 @@ export function useBlocks() {
   function extractBlockText(block) {
     const { content, type } = block;
 
-    if (!content || !type) return "";
-
     switch (type) {
       case "heading":
         return stripHtml(content.text);
@@ -66,7 +64,7 @@ export function useBlocks() {
         );
       case "markdown":
         return content.text
-          ? content.text.substring(0, 50)
+          ? stripHtml(content.text)
           : panel.t("field.blocks.markdown.name");
       case "list":
         return panel.t("field.blocks.list.name");
@@ -123,8 +121,6 @@ export function useBlocks() {
  */
 function stripHtml(html, limit = 50) {
   if (!html) return "";
-
   const text = html.replace(/<[^>]*>/g, "");
-
   return text.substring(0, limit);
 }

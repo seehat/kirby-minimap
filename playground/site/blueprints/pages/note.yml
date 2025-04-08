@@ -18,8 +18,20 @@ status:
 options:
   preview: https://kirby.tools/live-preview#pricing
 
-columns:
-  - width: 1/2
+tabs:
+  content:
+    label: Content
+    icon: text
+    sections:
+      content:
+        type: fields
+        fields:
+          text:
+            type: blocks
+
+  meta:
+    label: Meta
+    icon: cog
     sections:
       meta:
         type: fields
@@ -41,11 +53,3 @@ columns:
       files:
         type: files
         template: blocks/image
-
-  - width: 1/2
-    sections:
-      content:
-        type: fields
-        fields:
-          text:
-            type: blocks

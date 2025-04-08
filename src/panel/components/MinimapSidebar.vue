@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, useContent, usePanel, watch } from "kirbyuse";
+import { computed, nextTick, ref, useContent, usePanel, watch } from "kirbyuse";
 import { useBlocks } from "../composables/blocks";
 import {
   useEventListener,
@@ -107,6 +107,20 @@ function initializeMinimapUI() {
 
 // Fetch fields and set up observers for the current view
 async function initializeMinimapContent() {
+  // Ensure all Panel components are loaded before querying DOM elements
+  if (panel.isLoading) {
+    // Wait for the Panel to finish loading
+    await new Promise((resolve) => {
+      const stop = watch(
+        () => panel.isLoading,
+        () => {
+          nextTick(() => stop());
+          resolve();
+        },
+      );
+    });
+  }
+
   const modelFields = await panel.api.get(
     "__minimap__/model-fields",
     { id: panel.view.path },

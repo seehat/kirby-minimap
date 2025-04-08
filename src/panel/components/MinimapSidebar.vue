@@ -5,14 +5,12 @@ import {
   useEventListener,
   useIntersectionObserver,
 } from "../composables/listeners";
-import { useModelId } from "../composables/model";
 
 const EXCLUDED_FIELD_TYPES = ["gap", "hidden", "line"];
 const OPEN_STATE_STORAGE_KEY = "kirby$minimap";
 
 const panel = usePanel();
 const { currentContent, contentChanges } = useContent();
-const { getModelId } = useModelId();
 const { getBlockIcon, extractBlockText, scrollToBlock } = useBlocks();
 
 const minimap = ref();
@@ -109,11 +107,9 @@ function initializeMinimapUI() {
 
 // Fetch fields and set up observers for the current view
 async function initializeMinimapContent() {
-  const modelId = await getModelId();
-
   const modelFields = await panel.api.get(
     "__minimap__/model-fields",
-    { id: modelId ?? "site" },
+    { id: panel.view.path },
     undefined,
     // Silent
     true,

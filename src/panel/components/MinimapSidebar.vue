@@ -109,6 +109,10 @@ function initializeMinimapUI() {
 
 // Fetch fields and set up observers for the current view
 async function initializeMinimapContent() {
+  if (panel.view.path !== "site" && !panel.view.path.startsWith("pages/")) {
+    return;
+  }
+
   // Ensure all Panel components are loaded before querying DOM elements
   if (panel.isLoading) {
     // Wait for the Panel to finish loading

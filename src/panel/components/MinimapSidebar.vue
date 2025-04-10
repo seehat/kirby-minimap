@@ -30,12 +30,14 @@ const resolvedFields = computed(() =>
       const content = contentChanges.value[key] ?? currentContent.value[key];
       const blocks =
         field.type === "blocks" && Array.isArray(content)
-          ? content.map((block) => ({
-              ...block,
-              _icon: getBlockIcon(block.type),
-              _text: extractBlockText(block),
-              _active: activeBlockIds.value.includes(block.id),
-            }))
+          ? content
+              .filter((block) => !EXCLUDED_FIELD_TYPES.includes(block.type))
+              .map((block) => ({
+                ...block,
+                _icon: getBlockIcon(block.type),
+                _text: extractBlockText(block),
+                _active: activeBlockIds.value.includes(block.id),
+              }))
           : [];
 
       return [

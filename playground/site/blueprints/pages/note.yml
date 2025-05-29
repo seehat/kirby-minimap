@@ -22,34 +22,40 @@ tabs:
   content:
     label: Content
     icon: text
-    sections:
-      content:
-        type: fields
-        fields:
-          text:
-            type: blocks
+    columns:
+      main:
+        width: 1/1
+        sections:
+          content:
+            type: fields
+            fields:
+              text:
+                type: blocks
 
   meta:
     label: Meta
     icon: cog
-    sections:
+    columns:
       meta:
-        type: fields
-        fields:
-          cover:
-            type: files
-            multiple: false
-            query: page.images.template('image')
-            uploads:
-              template: image
+        width: 1/1
+        sections:
+          meta:
+            type: fields
+            fields:
+              cover:
+                type: files
+                multiple: false
+                query: page.images.template('image')
+                uploads:
+                  template: image
 
-          date:
-            type: date
-            time: true
-            default: now
-          author:
-            type: users
-          tags: true
-      files:
-        type: files
-        template: blocks/image
+              date:
+                type: date
+                time: true
+                default: now
+              author:
+                type: users
+              tags: true
+          files:
+            type: files
+            template: blocks/image

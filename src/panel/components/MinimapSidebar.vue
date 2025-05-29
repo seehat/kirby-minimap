@@ -259,7 +259,11 @@ function setCssProperty(property, value) {
 function extractCurrentTabFieldNames() {
   const fieldNames = new Set();
 
-  for (const column of panel.view.props.tab.columns) {
+  const columns = Array.isArray(panel.view.props.tab.columns)
+    ? panel.view.props.tab.columns
+    : Object.values(panel.view.props.tab.columns);
+
+  for (const column of columns) {
     for (const section of Object.values(column.sections)) {
       if (section.type !== "fields") continue;
 

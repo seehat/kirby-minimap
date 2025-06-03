@@ -25,8 +25,8 @@ export function useBlocks() {
    * @param {string} type - The block type
    * @returns {string} - The icon name to use
    */
-  function getBlockIcon(type) {
-    return BLOCK_ICON_MAP[type] ?? "box";
+  function getBlockIcon(type, field) {
+    return field.fieldsets[type]['icon'] ?? BLOCK_ICON_MAP[type] ?? "box";
   }
 
   /**
@@ -35,7 +35,7 @@ export function useBlocks() {
    * @param {object} block - The block object
    * @returns {string} - The text to display for the block
    */
-  function extractBlockText(block) {
+  function extractBlockText(block, field) {
     const { content, type } = block;
 
     switch (type) {
@@ -73,7 +73,7 @@ export function useBlocks() {
       case "table":
         return panel.t("field.blocks.table.name");
       default:
-        return type.charAt(0).toUpperCase() + type.slice(1);
+        return field.fieldsets[type]['name'] ?? type.charAt(0).toUpperCase() + type.slice(1);
     }
   }
 
